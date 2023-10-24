@@ -132,7 +132,7 @@ std::vector<int> row_sum_right(const std::vector<int>& input_vector) {
     return output_vector;
 }
 
-void swipe(int(&array)[4][4], char direction) {
+void swipe_horizontal(int(&array)[4][4], char direction) {
     std::vector<int> output_vectors[4];
     for (int i = 0; i < 4; i++) {
         std::vector<int> copied_row(array[i], array[i] + 4);
@@ -151,14 +151,48 @@ void swipe(int(&array)[4][4], char direction) {
     }
 }
 
+void swipe_vertical(int(&array)[4][4], char direction) {
+    std::vector<int> output_vectors[4];
+
+    for (int column = 0; column < 4; column++) {
+        std::vector<int> column_copy;
+        for (int i = 0; i < 4; i++) {
+            column_copy.push_back(array[i][column]);
+        }
+        if (direction == 'D') {
+            output_vectors[column] = row_sum_right(column_copy);
+        }
+        else if (direction == 'U') {
+            output_vectors[column] = row_sum_left(column_copy);
+        }
+    }
+
+    // Kopiowanie zawartoœci Ÿród³owej tablicy do docelowej tablicy
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            array[j][i] = output_vectors[i][j];
+        }
+    }
+}
+
 void swipe_left(int(&array)[4][4]) {
     char direction = 'L';
-    swipe(array, 'L');
+    swipe_horizontal(array, 'L');
 }
 
 void swipe_right(int(&array)[4][4]) {
     char direction = 'R';
-    swipe(array, 'R');
+    swipe_horizontal(array, 'R');
+}
+
+void swipe_down(int(&array)[4][4]) {
+    char direction = 'D';
+    swipe_vertical(array, 'D');
+}
+
+void swipe_up(int(&array)[4][4]) {
+    char direction = 'U';
+    swipe_vertical(array, 'U');
 }
 
 int main()
@@ -173,22 +207,7 @@ int main()
     std::cout << "\n";
 
     std::cout << "Array after one 'swipe right':\n";
-    swipe_right(game_board);
-    print_array(game_board);
-    std::cout << "\n";
-
-    std::cout << "Array after one 'swipe left':\n";
-    swipe_left(game_board);
-    print_array(game_board);
-    std::cout << "\n";
-
-    std::cout << "Array after one 'swipe right':\n";
-    swipe_right(game_board);
-    print_array(game_board);
-    std::cout << "\n";
-
-    std::cout << "Array after one 'swipe left':\n";
-    swipe_left(game_board);
+    swipe_up(game_board);
     print_array(game_board);
     std::cout << "\n";
 
