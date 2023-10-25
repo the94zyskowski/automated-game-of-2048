@@ -49,6 +49,28 @@ void win_value_check(int(&array)[4][4]) {
     }
 }
 
+bool pair_check(int tablica[4][4]) {
+    // Sprawdzenie w poziomie (w lewo i w prawo)
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {  // Sprawdzamy tylko do 3, ¿eby unikn¹æ wyjœcia poza zakres
+            if (tablica[i][j] == tablica[i][j + 1]) {
+                return true;
+            }
+        }
+    }
+
+    // Sprawdzenie w pionie (góra i dó³)
+    for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 3; i++) {  // Ponownie sprawdzamy do 3, aby unikn¹æ wyjœcia poza zakres
+            if (tablica[i][j] == tablica[i + 1][j]) {
+                return true;
+            }
+        }
+    }
+
+    return false;  // Jeœli ¿adne warunki nie zosta³y spe³nione, zwracamy false
+}
+
 void game_over() {
     std::cout << "Game lost you little bitch!\n"; // GAME OVER HERE <----------------------------------------------------
     exit(0);
@@ -67,7 +89,7 @@ void fill_random_cell(int(&array)[4][4]) {
         }
         array[position_y][position_x] = generate_cell_number();
     }
-    else {
+    else if (!pair_check(array)){
         game_over();
     }
 }
