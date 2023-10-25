@@ -1,11 +1,13 @@
 #include <random>
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <conio.h>  // Dla kbhit() i getch()
 
 void initialize_clear_board(int(&array)[4][4]) {
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            array[i][j] = -1; //Wype³nij tablicê -1 jako stan pocz¹tkowy.
+            array[i][j] = 0; //Wype³nij tablicê 0 jako stan pocz¹tkowy.
         }
     }
 }
@@ -28,12 +30,28 @@ int find_any_free_spot(int(&array)[4][4]) {
     int free_spots = 0;
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            if (array[i][j] == -1) {
+            if (array[i][j] == 0) {
                 free_spots++;
             }
         }
     }
     return free_spots;
+}
+
+void win_value_check(int(&array)[4][4]) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (array[i][j] == 2048) {
+                std::cout << "Congratz! Game won!\n"; // GAME WON HERE <----------------------------------------------------
+                exit(0);
+            }
+        }
+    }
+}
+
+void game_over() {
+    std::cout << "Game lost you little bitch!\n"; // GAME OVER HERE <----------------------------------------------------
+    exit(0);
 }
 
 void fill_random_cell(int(&array)[4][4]) {
@@ -43,14 +61,14 @@ void fill_random_cell(int(&array)[4][4]) {
         std::uniform_int_distribution<> distr(0, 3); // rozk³ad jednostajny dla liczb od 0 do 3
         unsigned int position_x = distr(gen);
         unsigned int position_y = distr(gen);
-        while (array[position_y][position_x] != -1) { //Sprawdz czy wygenerowane wspolrzedne kieruja do wypelnionej komorki
+        while (array[position_y][position_x] != 0) { //Sprawdz czy wygenerowane wspolrzedne kieruja do wypelnionej komorki
             position_x = distr(gen);
             position_y = distr(gen);
         }
         array[position_y][position_x] = generate_cell_number();
     }
     else {
-        std::cout << "Game lost you little bitch!\n"; // GAME OVER HERE <----------------------------------------------------
+        game_over();
     }
 }
 
@@ -178,37 +196,66 @@ void swipe_vertical(int(&array)[4][4], char direction) {
 void swipe_left(int(&array)[4][4]) {
     char direction = 'L';
     swipe_horizontal(array, 'L');
+    win_value_check(array);
+    fill_random_cell(array);
+    std::cout << "\033[H\033[J";
+    print_array(array);
 }
 
 void swipe_right(int(&array)[4][4]) {
     char direction = 'R';
     swipe_horizontal(array, 'R');
+    win_value_check(array);
+    fill_random_cell(array);
+    std::cout << "\033[H\033[J";
+    print_array(array);
 }
 
 void swipe_down(int(&array)[4][4]) {
     char direction = 'D';
     swipe_vertical(array, 'D');
+    win_value_check(array);
+    fill_random_cell(array);
+    std::cout << "\033[H\033[J";
+    print_array(array);
 }
 
 void swipe_up(int(&array)[4][4]) {
     char direction = 'U';
     swipe_vertical(array, 'U');
+    win_value_check(array);
+    fill_random_cell(array);
+    std::cout << "\033[H\033[J";
+    print_array(array);
 }
 
 int main()
 {
     int game_board[4][4];
     initialize_clear_board(game_board);
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 2; i++) {
         fill_random_cell(game_board);
     }
-    std::cout << "Generated array:\n";
     print_array(game_board);
-    std::cout << "\n";
-
-    std::cout << "Array after one 'swipe right':\n";
-    swipe_up(game_board);
-    print_array(game_board);
-    std::cout << "\n";
+    while (true) {
+        if (_kbhit()) {  // Jeœli klawisz zosta³ naciœniêty
+            char c = _getch();  // Pobierz naciœniêty klawisz
+            if (c == 'w') {
+                swipe_up(game_board);
+            }
+            else if (c == 's') {
+                swipe_down(game_board);
+            }
+            else if (c == 'a') {
+                swipe_left(game_board);
+            }
+            else if (c == 'd') {
+                swipe_right(game_board);
+            }
+            else {
+                std::cout << "Wrong input! Try: w, s, a or d keys.\n";
+            }
+        }
+    }
 
 }
