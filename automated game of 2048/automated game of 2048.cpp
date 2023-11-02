@@ -104,7 +104,7 @@ void print_array(int(&array)[4][4]) {
 }
 
 // Funkcja przesuwa elementy wektora i sumuje s¹siaduj¹ce równe wartoœci
-std::vector<int> row_sum_left(const std::vector<int>& input_vector) {
+std::vector<int> row_sum_left(const std::vector<int>& input_vector, int &score) {
     // Tworzymy wektor wyjœciowy o tej samej d³ugoœci co wektor wejœciowy
     // i inicjujemy go zerami
     std::vector<int> not_sorted_output_vector(4, 0);
@@ -120,6 +120,7 @@ std::vector<int> row_sum_left(const std::vector<int>& input_vector) {
         if (i + 1 < input_vector.size() && input_vector[i] == input_vector[i + 1] ) {
             // Jeœli tak, to sumujemy je i wstawiamy w wektorze wyjœciowym
             not_sorted_output_vector[idx] = input_vector[i] + input_vector[i + 1];
+            score = score + input_vector[i] + input_vector[i + 1];
             idx++; // Przesuwamy indeks w wektorze wyjœciowym
             i++; // Przeskakujemy do nastêpnego elementu, poniewa¿ ju¿ go zsumowaliœmy
         }
@@ -143,7 +144,7 @@ std::vector<int> row_sum_left(const std::vector<int>& input_vector) {
     return output_vector;
 }
 
-std::vector<int> row_sum_right(const std::vector<int>& input_vector) {
+std::vector<int> row_sum_right(const std::vector<int>& input_vector, int &score) {
     std::vector<int> not_sorted_output_vector(4, 0);
     std::vector<int> output_vector(4, 0);
 
@@ -152,6 +153,7 @@ std::vector<int> row_sum_right(const std::vector<int>& input_vector) {
     for (int i = input_vector.size()-1; i >= 0; i--) {
         if (i - 1 >= 0 && input_vector[i] == input_vector[i - 1]) {
             not_sorted_output_vector[idx] = input_vector[i] + input_vector[i - 1];
+            score = score + input_vector[i] + input_vector[i - 1];
             idx--;
             i--;
         }
@@ -172,14 +174,14 @@ std::vector<int> row_sum_right(const std::vector<int>& input_vector) {
     return output_vector;
 }
 
-void swipe_horizontal(int(&array)[4][4], char direction) {
+void swipe_horizontal(int(&array)[4][4], char direction, int &score) {
     std::vector<int> output_vectors[4];
     for (int i = 0; i < 4; i++) {
         std::vector<int> copied_row(array[i], array[i] + 4);
         if (direction == 'L') {
-            output_vectors[i] = row_sum_left(copied_row);
+            output_vectors[i] = row_sum_left(copied_row, score);
         } else if (direction == 'R') {
-            output_vectors[i] = row_sum_right(copied_row);
+            output_vectors[i] = row_sum_right(copied_row, score);
         }
     }
 
@@ -191,7 +193,7 @@ void swipe_horizontal(int(&array)[4][4], char direction) {
     }
 }
 
-void swipe_vertical(int(&array)[4][4], char direction) {
+void swipe_vertical(int(&array)[4][4], char direction, int &score) {
     std::vector<int> output_vectors[4];
 
     for (int column = 0; column < 4; column++) {
@@ -200,10 +202,10 @@ void swipe_vertical(int(&array)[4][4], char direction) {
             column_copy.push_back(array[i][column]);
         }
         if (direction == 'D') {
-            output_vectors[column] = row_sum_right(column_copy);
+            output_vectors[column] = row_sum_right(column_copy, score);
         }
         else if (direction == 'U') {
-            output_vectors[column] = row_sum_left(column_copy);
+            output_vectors[column] = row_sum_left(column_copy, score);
         }
     }
 
@@ -215,64 +217,70 @@ void swipe_vertical(int(&array)[4][4], char direction) {
     }
 }
 
-void swipe_left(int(&array)[4][4]) {
+void swipe_left(int(&array)[4][4], int &score) {
     char direction = 'L';
-    swipe_horizontal(array, 'L');
+    swipe_horizontal(array, 'L', score);
     win_value_check(array);
     fill_random_cell(array);
     std::cout << "\033[H\033[J";
     print_array(array);
+    std::cout << "Score: " << score << "\n";
 }
 
-void swipe_right(int(&array)[4][4]) {
+void swipe_right(int(&array)[4][4], int &score) {
     char direction = 'R';
-    swipe_horizontal(array, 'R');
+    swipe_horizontal(array, 'R', score);
     win_value_check(array);
     fill_random_cell(array);
     std::cout << "\033[H\033[J";
     print_array(array);
+    std::cout << "Score: " << score << "\n";
 }
 
-void swipe_down(int(&array)[4][4]) {
+void swipe_down(int(&array)[4][4], int &score) {
     char direction = 'D';
-    swipe_vertical(array, 'D');
+    swipe_vertical(array, 'D', score);
     win_value_check(array);
     fill_random_cell(array);
     std::cout << "\033[H\033[J";
     print_array(array);
+    std::cout << "Score: " << score << "\n";
 }
 
-void swipe_up(int(&array)[4][4]) {
+void swipe_up(int(&array)[4][4], int &score) {
     char direction = 'U';
-    swipe_vertical(array, 'U');
+    swipe_vertical(array, 'U', score);
     win_value_check(array);
     fill_random_cell(array);
     std::cout << "\033[H\033[J";
     print_array(array);
+    std::cout << "Score: " << score << "\n";
 }
 
 int main()
 {
     int game_board[4][4];
+    int score = 0;
     initialize_clear_board(game_board);
     for (int i = 0; i < 2; i++) {
         fill_random_cell(game_board);
     }
     print_array(game_board);
+    std::cout << "Score: " << score << "\n";
     while (true) {
         if (_kbhit()) {  // Jeœli klawisz zosta³ naciœniêty
             char c = _getch();  // Pobierz naciœniêty klawisz
             if (c == 'w') {
-                swipe_up(game_board);
+                swipe_up(game_board, score);
             }
             else if (c == 's') {
-                swipe_down(game_board);
+                swipe_down(game_board, score);
             }
             else if (c == 'a') {
-                swipe_left(game_board);
+                swipe_left(game_board, score);
             }
             else if (c == 'd') {
-                swipe_right(game_board);
+                swipe_right(game_board, score);
             }
             else {
                 std::cout << "Wrong input! Try: w, s, a or d keys.\n";
