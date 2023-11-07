@@ -1,4 +1,5 @@
 #include <vector>
+#pragma once
 
 void initialize_clear_board(int(&array)[4][4]);
 
@@ -31,4 +32,3 @@ void swipe_right(int(&array)[4][4], int& score);
 void swipe_down(int(&array)[4][4], int& score);
 
 void swipe_up(int(&array)[4][4], int& score);
-#pragma once
