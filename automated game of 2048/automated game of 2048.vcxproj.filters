@@ -18,8 +18,16 @@
     <ClCompile Include="automated game of 2048.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="functions.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
